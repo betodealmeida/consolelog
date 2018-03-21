@@ -44,32 +44,32 @@ with open('LICENSE') as f:
 # Load the package's __version__.py module as a dictionary.
 about = {}
 with open(os.path.join(here, NAME, '__version__.py')) as f:
-exec(f.read(), about)
+    exec(f.read(), about)
 
 
 class UploadCommand(Command):
-"""Support setup.py upload."""
+    """Support setup.py upload."""
 
-description = 'Build and publish the package.'
-user_options = []
+    description = 'Build and publish the package.'
+    user_options = []
 
-@staticmethod
-def status(s):
-    """Prints things in bold."""
-    print('\033[1m{0}\033[0m'.format(s))
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
 
-def initialize_options(self):
-    pass
-
-def finalize_options(self):
-    pass
-
-def run(self):
-    try:
-        self.status('Removing previous builds…')
-        rmtree(os.path.join(here, 'dist'))
-    except OSError:
+    def initialize_options(self):
         pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status('Removing previous builds…')
+            rmtree(os.path.join(here, 'dist'))
+        except OSError:
+            pass
 
         self.status('Building Source and Wheel (universal) distribution…')
         os.system(
@@ -90,25 +90,15 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    packages=find_packages(exclude=('tests',)),
+    #packages=find_packages(exclude=('tests',)),
     # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
+    py_modules=['console_log'],
 
     entry_points={
-        'console_scripts': [
-            'druiddb = druiddb.console:main',
-        ],
-        'sqlalchemy.dialects': [
-            'druid = druiddb.druid_sqlalchemy:DruidHTTPDialect',
-            'druid.http = druiddb.druid_sqlalchemy:DruidHTTPDialect',
-            'druid.https = druiddb.druid_sqlalchemy:DruidHTTPSDialect',
-        ],
     },
     install_requires=REQUIRED,
     extras_require={
         'dev': development_extras,
-        'sqlalchemy': sqlalchemy_extras,
-        'cli': cli_extras,
     },
     include_package_data=True,
     license=license,
