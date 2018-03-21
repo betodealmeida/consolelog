@@ -16,6 +16,7 @@ DESCRIPTION = 'Log to browser console'
 URL = 'https://github.com/betodealmeida/consolelog'
 EMAIL = 'beto@lyft.com'
 AUTHOR = 'Beto Dealmeida'
+VERSION = '0.1.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -40,11 +41,6 @@ with open('README.rst') as f:
 
 with open('LICENSE') as f:
     license = f.read()
-
-# Load the package's __version__.py module as a dictionary.
-about = {}
-with open(os.path.join(here, NAME, '__version__.py')) as f:
-    exec(f.read(), about)
 
 
 class UploadCommand(Command):
@@ -84,7 +80,7 @@ class UploadCommand(Command):
 # Where the magic happens:
 setup(
     name=NAME,
-    version=about['__version__'],
+    version=VERSION,
     description=DESCRIPTION,
     long_description=long_description,
     author=AUTHOR,

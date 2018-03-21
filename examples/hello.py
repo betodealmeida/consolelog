@@ -3,7 +3,7 @@ import logging
 from flask import Flask
 from werkzeug.serving import run_simple
 
-from consolelog import ConsoleLog
+from console_log import ConsoleLog
 
 
 app = Flask(__name__)
