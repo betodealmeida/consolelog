@@ -27,4 +27,4 @@ app = ConsoleLog(app, console)
 
 The logged messages will them show up in the browser console:
 
-[[https://github.com/betodealmeida/consolelog/blob/master/docs/console_log.png]]
+[[https://github.com/betodealmeida/consolelog/blob/master/docs/console_log.png|alt=Console example]]
