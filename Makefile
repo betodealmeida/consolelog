@@ -7,7 +7,7 @@ test:
 README.rst: README.md
 	pandoc --from=markdown --to=rst --output=README.rst README.md
 
-requirements.txt:
-	pipreqs --force druiddb --savepath requirements.txt
+requirements.txt: console_log.py
+	pipreqs --force .
 
 .PHONY: init test

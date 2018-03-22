@@ -16,17 +16,23 @@ DESCRIPTION = 'Log to browser console'
 URL = 'https://github.com/betodealmeida/consolelog'
 EMAIL = 'beto@lyft.com'
 AUTHOR = 'Beto Dealmeida'
-VERSION = '0.1.3'
+VERSION = '0.2.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
     'werkzeug',
+    'wsgigzip',
 ]
 
 development_extras = [
     'nose',
     'pipreqs',
     'twine',
+]
+
+examples = [
+    'gevent',
+    'gevent-websocket',
 ]
 
 # The rest you shouldn't have to touch too much :)
@@ -95,6 +101,7 @@ setup(
     install_requires=REQUIRED,
     extras_require={
         'dev': development_extras,
+        'examples': examples,
     },
     include_package_data=True,
     license=license,

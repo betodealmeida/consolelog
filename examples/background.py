@@ -1,4 +1,6 @@
 import logging
+import threading
+import time
 
 from flask import Flask
 from gevent import pywsgi
@@ -12,6 +14,16 @@ app = Flask(__name__)
 
 logger = logging.getLogger('console')
 logger.setLevel(logging.DEBUG)
+
+
+def ping():
+    while True:
+        logger.info('ping')
+        time.sleep(1)
+
+t = threading.Thread(target=ping)
+t.setDaemon(True)
+t.start()
 
 
 @app.route("/")

@@ -1,95 +1,91 @@
-from collections import defaultdict
-import gzip
-from io import BytesIO
 import json
 import logging
 import os.path
+from queue import Queue
 
 from werkzeug.wrappers import Response
+from wsgigzip import gzip
 
 
-# TODO:
-# - use BeautifulSoup for injecting JS
-# - work with streaming response
-
-
+# map between Python levels and the console method in Javascript
 levels = {
-    logging.CRITICAL: 'console.error',
-    logging.ERROR: 'console.error',
-    logging.WARNING: 'console.warn',
-    logging.INFO: 'console.info',
-    logging.DEBUG: 'console.debug',
-    logging.NOTSET: 'console.log',
+    logging.CRITICAL: 'error',
+    logging.ERROR: 'error',
+    logging.WARNING: 'warn',
+    logging.INFO: 'info',
+    logging.DEBUG: 'debug',
+    logging.NOTSET: 'log',
 }
 
 
 class DictHandler(logging.Handler):
-    def __init__(self):
+    def __init__(self, queue):
         super().__init__()
-        self.messages = defaultdict(list)
+        self.queue = queue
 
     def emit(self, record):
         record.pathname = os.path.abspath(record.pathname)
-        self.messages[record.levelno].append(self.format(record))
+        message = {
+            'level': levels[record.levelno],
+            'content': self.format(record),
+        }
+        self.queue.put(json.dumps(message))
 
 
-def gzip_response(response):
-    gzip_buffer = BytesIO()
-    gzip_file = gzip.GzipFile(mode='wb', fileobj=gzip_buffer)
-    gzip_file.write(response.data)
-    gzip_file.close()
+JAVASCRIPT = """
+console.log('Starting...');
 
-    response.data = gzip_buffer.getvalue()
-    response.headers['Content-Encoding'] = 'gzip'
-    response.headers['Vary'] = 'Accept-Encoding'
-    response.headers['Content-Length'] = len(response.data)
-
-    return response
+const ws = new WebSocket("ws://localhost:5000/socketserver");
+ws.onmessage = function (event) {
+    const msg = JSON.parse(event.data);
+    console[msg.level](msg.content);
+}
+"""
 
 
 class ConsoleLog:
-    def __init__(self, app, root):
+    def __init__(self, app, logger, js_path='/__console__.js'):
         self.app = app
+        self.queue = Queue()
+        self.logger = logger
+        self.js_path = js_path
 
-        self.handler = DictHandler()
+        handler = DictHandler(self.queue)
         formatter = logging.Formatter(
-            '[%(asctime)s] file://%(pathname)s:%(lineno)d: %(message)s')
-        self.handler.setFormatter(formatter)
-        root.addHandler(self.handler)
+            '[file://%(pathname)s:%(lineno)d] %(message)s')
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
 
     def __call__(self, environ, start_response):
+        if environ.get('wsgi.websocket'):
+            ws = environ["wsgi.websocket"]
+            while not ws.closed:
+                message = self.queue.get()
+                ws.send(message)
+                self.queue.task_done()
+            return
+        elif environ["PATH_INFO"] == self.js_path:
+            response = Response(JAVASCRIPT)
+            return response(environ, start_response)
+
         # request non-compressed response
-        http_accept_encoding = environ.pop('HTTP_ACCEPT_ENCODING', '')
-
+        environ.pop('HTTP_ACCEPT_ENCODING', '')
         response = Response.from_app(self.app, environ)
-        if response.mimetype == 'text/html':
-            response = self.inject(response, script=True)
-        elif response.mimetype == 'application/javascript':
-            response = self.inject(response, script=False)
 
-        # compress response?
-        if 'gzip' in http_accept_encoding:
-            response = gzip_response(response)
+        # inject JS
+        if response.mimetype == 'text/html':
+            response = self.inject(response)
+
+        # compress response, if necessary
+        response = gzip()(response)
 
         return response(environ, start_response)
 
-    def inject(self, response, script=True):
+    def inject(self, response):
+        code = '<script src="{}" async="async"></script>'.format(self.js_path)
+
         data = response.get_data()
         payload = data.decode(response.charset)
-
-        messages = self.handler.messages.copy()
-        self.handler.messages.clear()
-        code = []
-        for level, method in levels.items():
-            if messages[level]:
-                message = json.dumps('\n'.join(messages[level]))
-                code.append(f'{method}({message});')
-
-        if code:
-            code = '\n'.join(code)
-            if script:
-                response.data = f'{payload}\n<script>{code}</script>'
-            else:
-                response.data = f'{payload}\n{code}'
+        response.data = '{code}\n{payload}'.format(code=code, payload=payload)
 
         return response
