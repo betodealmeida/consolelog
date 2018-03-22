@@ -20,6 +20,7 @@ def hello():
     logger.warning('Warning logged from Python')
     logger.info('Info logged from Python')
     logger.debug('Debug logged from Python')
+    logger.debug({'foo': ['bar', 'baz']})
     return "Hello World!"
 
 

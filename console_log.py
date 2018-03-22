@@ -27,7 +27,7 @@ class DictHandler(logging.Handler):
         record.pathname = os.path.abspath(record.pathname)
         message = {
             'level': levels[record.levelno],
-            'content': self.format(record),
+            'content': record.msg,
         }
         self.queue.put(json.dumps(message))
 

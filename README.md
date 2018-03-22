@@ -20,11 +20,19 @@ def hello():
     logger.warning('Warning logged from Python')
     logger.info('Info logged from Python')
     logger.debug('Debug logged from Python')
+    logger.debug({'foo': ['bar', 'baz']})
     return "Hello World!"
 
-app = ConsoleLog(app, console)
+app.wsgi_app = ConsoleLog(app.wsgi_app, console)
 ```
 
 The logged messages will them show up in the browser console:
 
 ![Example showing messages in console](https://github.com/betodealmeida/consolelog/blob/master/docs/console_log.png)
+
+# How it works #
+
+The new WSGI app does two things:
+
+1. Creates a websocket backchannel.
+2. Injects Javascript code into HTML responses, fetching data from the websocket channel and logging them to console.
