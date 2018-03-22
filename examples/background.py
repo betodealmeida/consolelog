@@ -17,9 +17,12 @@ logger.setLevel(logging.DEBUG)
 
 
 def ping():
+    i = 0
     while True:
-        logger.info('ping')
+        logger.info(i)
+        i += 1
         time.sleep(1)
+
 
 t = threading.Thread(target=ping)
 t.setDaemon(True)
