@@ -35,11 +35,11 @@ class DictHandler(logging.Handler):
 JAVASCRIPT = """
 console.log('Starting...');
 
-const ws = new WebSocket("ws://localhost:5000/socketserver");
-ws.onmessage = function (event) {
+const ws = new WebSocket("ws://{base}/socketserver");
+ws.onmessage = function (event) {{
     const msg = JSON.parse(event.data);
     console[msg.level](msg.content);
-}
+}}
 """
 
 
@@ -65,7 +65,13 @@ class ConsoleLog:
                 self.queue.task_done()
             return
         elif environ["PATH_INFO"] == self.js_path:
-            response = Response(JAVASCRIPT)
+            if environ.get('HTTP_HOST'):
+                base = environ['HTTP_HOST']
+            else:
+                host = environ['SERVER_NAME']
+                port = environ['SERVER_PORT']
+                base = ':'.join((host, port))
+            response = Response(JAVASCRIPT.format(base=base))
             return response(environ, start_response)
 
         # request non-compressed response
