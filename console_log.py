@@ -83,7 +83,6 @@ class ConsoleLog:
 
     def inject(self, response):
         code = '<script src="{}" async="async"></script>'.format(self.js_path)
-
         data = response.get_data()
         payload = data.decode(response.charset)
         response.data = '{code}\n{payload}'.format(code=code, payload=payload)
