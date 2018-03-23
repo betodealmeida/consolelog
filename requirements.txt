@@ -1,6 +1,6 @@
-Flask==0.12.2
 setuptools==39.0.1
 gevent==1.2.2
-wsgigzip==0.1.4
 Werkzeug==0.14.1
+wsgigzip==0.1.4
+Flask==0.12.2
 gevent_websocket==0.10.1

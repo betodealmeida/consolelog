@@ -3,6 +3,7 @@ import logging
 import os.path
 
 from gevent.queue import Queue
+from geventwebsocket import WebSocketError
 from werkzeug.exceptions import RequestTimeout
 from werkzeug.wrappers import Response
 from wsgigzip import gzip
