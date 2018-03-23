@@ -26,7 +26,7 @@ def hello():
 app.wsgi_app = ConsoleLog(app.wsgi_app, console)
 ```
 
-The logged messages will them show up in the browser console:
+The logged messages will then show up in the browser console:
 
 ![Example showing messages in console](https://github.com/betodealmeida/consolelog/blob/master/docs/console_log.png)
 

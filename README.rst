@@ -28,7 +28,7 @@ browser console from Python:
 
     app.wsgi_app = ConsoleLog(app.wsgi_app, console)
 
-The logged messages will them show up in the browser console:
+The logged messages will then show up in the browser console:
 
 .. figure:: https://github.com/betodealmeida/consolelog/blob/master/docs/console_log.png
    :alt: Example showing messages in console
