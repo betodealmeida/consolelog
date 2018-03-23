@@ -1,16 +1,13 @@
 import logging
-import threading
-import time
 
 from flask import Flask
+import gevent
 from gevent import pywsgi
-from gevent import monkey
 from geventwebsocket.handler import WebSocketHandler
 import werkzeug.serving
 
 from console_log import ConsoleLog
 
-monkey.patch_all()
 
 app = Flask(__name__)
 
@@ -23,12 +20,7 @@ def ping():
     while True:
         logger.info(i)
         i += 1
-        time.sleep(2)
-
-
-t = threading.Thread(target=ping)
-t.setDaemon(True)
-t.start()
+        gevent.sleep(2)
 
 
 @app.route("/")
@@ -44,10 +36,12 @@ def hello():
 app = ConsoleLog(app, logger)
 
 
-@werkzeug.serving.run_with_reloader
 def main():
     server = pywsgi.WSGIServer(("", 5000), app, handler_class=WebSocketHandler)
-    server.serve_forever()
+    gevent.joinall([
+        gevent.spawn(server.start),
+        gevent.spawn(ping),
+    ])
 
 
 if __name__ == '__main__':

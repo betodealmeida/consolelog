@@ -1,8 +1,9 @@
 import json
 import logging
 import os.path
-from queue import Queue
 
+from gevent.queue import Queue
+from werkzeug.exceptions import RequestTimeout
 from werkzeug.wrappers import Response
 from wsgigzip import gzip
 
@@ -35,7 +36,7 @@ class DictHandler(logging.Handler):
             message['content'] = repr(record.msg)
             payload = json.dumps(message)
 
-        self.queue.put(payload)
+        self.queue.put_nowait(payload)
 
 
 JAVASCRIPT = """
@@ -67,9 +68,11 @@ class ConsoleLog:
             ws = environ["wsgi.websocket"]
             while not ws.closed:
                 message = self.queue.get()
-                ws.send(message)
-                self.queue.task_done()
-            return
+                try:
+                    ws.send(message)
+                except WebSocketError:
+                    break
+            raise RequestTimeout()
         elif environ["PATH_INFO"] == self.js_path:
             if environ.get('HTTP_HOST'):
                 base = environ['HTTP_HOST']

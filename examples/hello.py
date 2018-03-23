@@ -1,14 +1,11 @@
 import logging
 
 from flask import Flask
-from gevent import monkey
 from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 import werkzeug.serving
 
 from console_log import ConsoleLog
-
-monkey.patch_all()
 
 app = Flask(__name__)
 
