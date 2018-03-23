@@ -29,7 +29,13 @@ class DictHandler(logging.Handler):
             'level': levels[record.levelno],
             'content': record.msg,
         }
-        self.queue.put(json.dumps(message))
+        try:
+            payload = json.dumps(message)
+        except TypeError:
+            message['content'] = repr(record.msg)
+            payload = json.dumps(message)
+
+        self.queue.put(payload)
 
 
 JAVASCRIPT = """

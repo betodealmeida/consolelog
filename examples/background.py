@@ -33,6 +33,7 @@ t.start()
 
 @app.route("/")
 def hello():
+    logger.debug(app)
     logger.error('Error logged from Python')
     logger.warning('Warning logged from Python')
     logger.info('Info logged from Python')
