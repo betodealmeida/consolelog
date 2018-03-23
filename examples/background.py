@@ -4,11 +4,13 @@ import time
 
 from flask import Flask
 from gevent import pywsgi
+from gevent import monkey
 from geventwebsocket.handler import WebSocketHandler
 import werkzeug.serving
 
 from console_log import ConsoleLog
 
+monkey.patch_all()
 
 app = Flask(__name__)
 
@@ -21,7 +23,7 @@ def ping():
     while True:
         logger.info(i)
         i += 1
-        time.sleep(1)
+        time.sleep(2)
 
 
 t = threading.Thread(target=ping)

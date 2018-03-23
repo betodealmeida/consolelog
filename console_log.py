@@ -35,11 +35,11 @@ class DictHandler(logging.Handler):
 JAVASCRIPT = """
 console.log('Starting...');
 
-const ws = new WebSocket("ws://{base}/socketserver");
+const ws = new WebSocket("ws://{base}/__ws__");
 ws.onmessage = function (event) {{
     const msg = JSON.parse(event.data);
     console[msg.level](msg.content);
-}}
+}};
 """
 
 
