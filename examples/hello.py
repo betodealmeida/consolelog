@@ -1,3 +1,4 @@
+import html
 import logging
 
 from flask import Flask
@@ -12,6 +13,9 @@ app = Flask(__name__)
 logger = logging.getLogger('console')
 logger.setLevel(logging.DEBUG)
 
+with open(__file__) as f:
+    source = '<pre>{}</pre>'.format(html.escape(f.read()))
+
 
 @app.route("/")
 def hello():
@@ -20,7 +24,7 @@ def hello():
     logger.info('Info logged from Python')
     logger.debug('Debug logged from Python')
     logger.debug({'foo': ['bar', 'baz']})
-    return "Hello World!"
+    return source
 
 
 app = ConsoleLog(app, logger)
