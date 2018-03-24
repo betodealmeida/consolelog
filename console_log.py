@@ -59,13 +59,10 @@ class ConsoleLog:
         self.js_path = js_path
 
         handler = DictHandler(self.queue)
-        formatter = logging.Formatter(
-            '[file://%(pathname)s:%(lineno)d] %(message)s')
-        handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
     def __call__(self, environ, start_response):
-        if environ.get('wsgi.websocket'):
+        if 'wsgi.websocket' in environ:
             ws = environ["wsgi.websocket"]
             while not ws.closed:
                 message = self.queue.get()

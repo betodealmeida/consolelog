@@ -10,7 +10,7 @@ README.rst: README.md
 requirements.txt: console_log.py
 	pipreqs --force .
 
-upload: README.rst
+upload: README.rst requirements.txt
 	python setup.py upload
 
 .PHONY: init test
