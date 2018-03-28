@@ -59,13 +59,10 @@ class ConsoleLog:
         self.js_path = js_path
 
         handler = QueueHandler(self.queue)
-        formatter = logging.Formatter(
-            '[file://%(pathname)s:%(lineno)d] %(message)s')
-        handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
     def __call__(self, environ, start_response):
-        if environ.get('wsgi.websocket'):
+        if 'wsgi.websocket' in environ:
             ws = environ["wsgi.websocket"]
             while not ws.closed:
                 message = self.queue.get()
@@ -85,7 +82,7 @@ class ConsoleLog:
             return response(environ, start_response)
 
         # request non-compressed response
-        environ.pop('HTTP_ACCEPT_ENCODING', '')
+        http_accept_encoding = environ.pop('HTTP_ACCEPT_ENCODING', '')
         response = Response.from_app(self.app, environ)
 
         # inject JS
@@ -93,6 +90,8 @@ class ConsoleLog:
             response = self.inject(response)
 
         # compress response, if necessary
+        if http_accept_encoding:
+            environ['HTTP_ACCEPT_ENCODING'] = http_accept_encoding
         response = gzip()(response)
 
         return response(environ, start_response)
