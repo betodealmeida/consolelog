@@ -20,7 +20,7 @@ levels = {
 }
 
 
-class DictHandler(logging.Handler):
+class QueueHandler(logging.Handler):
     def __init__(self, queue):
         super().__init__()
         self.queue = queue
@@ -58,7 +58,7 @@ class ConsoleLog:
         self.logger = logger
         self.js_path = js_path
 
-        handler = DictHandler(self.queue)
+        handler = QueueHandler(self.queue)
         formatter = logging.Formatter(
             '[file://%(pathname)s:%(lineno)d] %(message)s')
         handler.setFormatter(formatter)
