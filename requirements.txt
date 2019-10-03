@@ -1,6 +1,6 @@
 setuptools==39.0.1
 gevent==1.2.2
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 wsgigzip==0.1.4
 Flask==0.12.2
 gevent_websocket==0.10.1
