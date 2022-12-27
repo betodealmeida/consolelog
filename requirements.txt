@@ -1,4 +1,4 @@
-setuptools==39.0.1
+setuptools==65.5.1
 gevent==1.2.2
 Werkzeug==0.14.1
 wsgigzip==0.1.4
